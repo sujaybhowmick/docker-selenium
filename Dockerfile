@@ -1,8 +1,6 @@
-################
-# Headless e2e #
-################
+
 FROM ubuntu:14.04.1
-MAINTAINER sujay bhowmick <sujaybhowmick@gmail.com>
+MAINTAINER Sujay Bhowmick <sujaybhowmick@gmail.com>
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV DEBCONF_NONINTERACTIVE_SEEN true
@@ -53,10 +51,10 @@ RUN apt-get update -qqy \
   && mkdir -p ~/.vnc \
   && x11vnc -storepasswd secret ~/.vnc/passwd
 
-#======
-# Java
+#=========
+# Java 7
 # Minimal runtime used for executing non GUI Java programs
-#======
+#=========
 RUN apt-get update -qqy \
   && apt-get -qqy --no-install-recommends install \
     openjdk-7-jre-headless \
@@ -79,6 +77,15 @@ RUN apt-get update -qqy \
 #==========
 RUN  mkdir -p /opt/selenium \
   && wget --no-verbose http://selenium-release.storage.googleapis.com/2.44/selenium-server-standalone-2.44.0.jar -O /opt/selenium/selenium-server-standalone.jar
+
+  #==================
+  # Maven
+  #==================
+ENV MAVEN_VERSION 3.2.3
+
+RUN curl -sSL http://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz | tar xzf - -C /usr/share \
+  && mv /usr/share/apache-maven-$MAVEN_VERSION /usr/share/maven \
+  && ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
 
 #==================
 # Chrome webdriver
