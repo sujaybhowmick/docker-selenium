@@ -51,6 +51,14 @@ RUN apt-get update -qqy \
   && mkdir -p ~/.vnc \
   && x11vnc -storepasswd secret ~/.vnc/passwd
 
+#===============
+# Install CURL
+#===============
+RUN apt-get update -qqy \
+  && apt-get -qqy install \
+  curl
+  && rm -rf /var/lib/apt/lists/*
+
 #=========
 # Java 7
 # Minimal runtime used for executing non GUI Java programs
@@ -78,9 +86,9 @@ RUN apt-get update -qqy \
 RUN  mkdir -p /opt/selenium \
   && wget --no-verbose http://selenium-release.storage.googleapis.com/2.44/selenium-server-standalone-2.44.0.jar -O /opt/selenium/selenium-server-standalone.jar
 
-  #==================
-  # Maven
-  #==================
+#==================
+# Maven
+#==================
 ENV MAVEN_VERSION 3.2.3
 
 RUN curl -sSL http://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz | tar xzf - -C /usr/share \
@@ -139,7 +147,9 @@ RUN sudo useradd seluser --shell /bin/bash --create-home \
 #====================================================================
 # Script to run selenium standalone server for Chrome and/or Firefox
 #====================================================================
-COPY ./bin/*.sh /opt/selenium/
+COPY ./bin/start_env.sh /opt/selenium/
+COPY ./bin/local-sel-headless.sh /opt/selenium/
+
 RUN  chmod +x /opt/selenium/*.sh
 
 #===========
@@ -175,5 +185,6 @@ EXPOSE 4444 5900
 #===================
 # CMD or ENTRYPOINT
 #===================
-# Start a selenium standalone server for Chrome and/or Firefox
-CMD ["/opt/selenium/start_vnc.sh"]
+
+#start vnc server
+CMD ["/opt/selenium/start_env.sh"]
